@@ -1,30 +1,42 @@
-# Use an ARM-compatible base image
-FROM arm32v7/ubuntu:18.04
+# Gunakan image dasar Debian Bullseye untuk ARM64
+FROM debian:bullseye
 
-# Prerequisites
-RUN apt update && apt install -y curl git unzip xz-utils zip libglu1-mesa openjdk-8-jdk wget
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    wget \
+    curl \
+    unzip \
+    xz-utils \
+    libglu1-mesa \
+    mesa-utils \
+    libegl1-mesa-dev \
+    libgbm-dev \
+    libgles2-mesa-dev \
+    libdrm-dev \
+    udev \
+    sudo
 
-# Set up new user
-RUN useradd -ms /bin/bash developer
-USER developer
-WORKDIR /home/developer
+# Install Flutter
+RUN git clone https://github.com/flutter/flutter.git /usr/local/flutter
+ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:${PATH}"
+RUN flutter channel stable
+RUN flutter upgrade
+RUN flutter config --enable-linux-desktop
 
-# Prepare Android directories and system variables
-RUN mkdir -p Android/sdk
-ENV ANDROID_SDK_ROOT /home/developer/Android/sdk
-RUN mkdir -p .android && touch .android/repositories.cfg
+# Install Flutter Pi
+RUN git clone https://github.com/ardera/flutter-pi.git /usr/local/flutter-pi
+RUN cd /usr/local/flutter-pi && make
 
-# Set up Android SDK
-RUN wget -O sdk-tools.zip https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
-RUN unzip sdk-tools.zip && rm sdk-tools.zip
-RUN mv tools Android/sdk/tools
-RUN cd Android/sdk/tools/bin && yes | ./sdkmanager --licenses
-RUN cd Android/sdk/tools/bin && ./sdkmanager "build-tools;29.0.2" "patcher;v4" "platform-tools" "platforms;android-29" "sources;android-29"
-ENV PATH "$PATH:/home/developer/Android/sdk/platform-tools"
+# Copy project files
+WORKDIR /app
+COPY pubspec.yaml /app/pubspec.yaml
+COPY pubspec.lock /app/pubspec.lock
+RUN flutter pub get
+COPY . /app
 
-# Download Flutter SDK
-RUN git clone https://github.com/flutter/flutter.git
-ENV PATH "$PATH:/home/developer/flutter/bin"
+# Build the Flutter app for Linux
+RUN flutter build linux --release
 
-# Run basic check to download Dart SDK
-RUN flutter doctor
+# Run the app using Flutter Pi
+CMD ["flutter-pi", "/app/build/linux/release/bundle"]
