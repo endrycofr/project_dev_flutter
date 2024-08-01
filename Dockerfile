@@ -1,8 +1,14 @@
 # Gunakan image dasar Debian Bullseye untuk ARM64
 FROM debian:bullseye
 
+# Set non-interaktif untuk menghindari prompt selama instalasi
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    apt-transport-https \
+    ca-certificates \
+    gnupg \
     git \
     wget \
     curl \
