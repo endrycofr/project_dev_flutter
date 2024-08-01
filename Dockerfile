@@ -2,7 +2,7 @@
 FROM debian:bullseye
 
 # Install dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     wget \
     curl \
@@ -15,7 +15,9 @@ RUN apt-get update && apt-get install -y \
     libgles2-mesa-dev \
     libdrm-dev \
     udev \
-    sudo
+    sudo && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install Flutter
 RUN git clone https://github.com/flutter/flutter.git /usr/local/flutter
