@@ -1,10 +1,10 @@
-# Gunakan image dasar Debian Bullseye untuk ARM64
+# Use Debian Bullseye base image for ARM64
 FROM debian:bullseye
 
-# Set non-interaktif untuk menghindari prompt selama instalasi
+# Set non-interactive to avoid prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install dependencies
+# Install base dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     wget \
@@ -27,7 +27,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install additional dependencies for gstreamer (if needed)
+# Install additional dependencies for GStreamer (if needed)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgstreamer1.0-dev \
     libgstreamer-plugins-base1.0-dev \
@@ -41,40 +41,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Clone flutter-engine-binaries-for-arm repository and install
-RUN git clone --depth 1 https://github.com/ardera/flutter-engine-binaries-for-arm.git engine-binaries
-WORKDIR /engine-binaries
-RUN sudo ./install.sh
+# Clone and install Flutter engine binaries for ARM
+RUN git clone --depth 1 https://github.com/ardera/flutter-engine-binaries-for-arm.git /engine-binaries && \
+    cd /engine-binaries && \
+    sudo ./install.sh
 
-# Clone flutter-pi repository and compile
-RUN git clone --recursive https://github.com/ardera/flutter-pi /usr/local/flutter-pi
-WORKDIR /usr/local/flutter-pi
-RUN mkdir build && cd build && cmake .. && make -j$(nproc) && sudo make install
+# Clone and build Flutter-pi
+RUN git clone --recursive https://github.com/ardera/flutter-pi /usr/local/flutter-pi && \
+    cd /usr/local/flutter-pi && \
+    mkdir build && \
+    cd build && \
+    cmake .. && \
+    make -j$(nproc) && \
+    sudo make install
 
 # Install Flutter SDK
-WORKDIR /home/rootnow
-RUN wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_2.10.5-stable.tar.xz
-RUN tar xf flutter_linux_2.10.5-stable.tar.xz
-
-# Update PATH
-RUN echo 'export PATH="$PATH:/home/rootnow/flutter/bin"' >> ~/.bashrc
-RUN echo 'export PATH=$PATH:/opt/flutter-elinux/bin' >> ~/.bashrc
-RUN echo 'export PATH=$PATH:/home/rootnow/snap/flutter/common/flutter' >> ~/.bashrc
-RUN echo 'export PATH=$PATH:/home/rootnow/project_dev_flutter/build/flutter_assets' >> ~/.bashrc
-RUN echo 'export PATH=$PATH:/home/rootnow/flutter/bin' >> ~/.bashrc
-RUN source ~/.bashrc
-
-# Copy project files and build Flutter app
-COPY project_dev_flutter /home/rootnow/project_dev_flutter
-WORKDIR /home/rootnow/project_dev_flutter
-RUN flutter pub get
-RUN flutter build bundle
-
-# Sync build assets
-RUN rsync -a ./build/flutter_assets /home/rootnow/project_dev_flutter/build/flutter_assets
+WORKDIR /home/pi
+RUN wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_2.10.5-stable.tar.xz && \
+    tar xf flutter_linux_2.10.5-stable.tar.xz
 
 # Install xdg-user-dirs if needed
-RUN apt-get update && apt-get install -y --no-install-recommends xdg-user-dirs && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends xdg-user-dirs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Run the Flutter app in profile mode
 CMD ["flutter", "run", "--profile"]
