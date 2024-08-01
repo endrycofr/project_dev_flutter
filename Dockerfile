@@ -4,9 +4,11 @@ FROM debian:bullseye
 # Set non-interactive to avoid prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update package sources, install dependencies, clean up, and remove cache
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+# Update package sources
+RUN apt-get update
+
+# Install base dependencies
+RUN apt-get install -y --no-install-recommends \
     git \
     wget \
     curl \
@@ -24,8 +26,10 @@ RUN apt-get update && \
     libinput-dev \
     libudev-dev \
     libxkbcommon-dev \
-    sudo && \
-    apt-get clean && \
+    sudo
+
+# Clean up package cache
+RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Install additional dependencies for GStreamer (if needed)
