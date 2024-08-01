@@ -1,4 +1,4 @@
-# Use a base image with ARM64 architecture
+# Use a base image for ARM64
 FROM arm64v8/debian:bullseye
 
 # Set non-interactive to avoid prompts during package installation
