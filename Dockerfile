@@ -6,45 +6,75 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    apt-transport-https \
-    ca-certificates \
-    gnupg \
     git \
     wget \
     curl \
     unzip \
     xz-utils \
-    libglu1-mesa \
-    mesa-utils \
-    libegl1-mesa-dev \
-    libgbm-dev \
+    cmake \
+    libgl1-mesa-dev \
     libgles2-mesa-dev \
+    libegl1-mesa-dev \
     libdrm-dev \
-    udev \
+    libgbm-dev \
+    ttf-mscorefonts-installer \
+    fontconfig \
+    libsystemd-dev \
+    libinput-dev \
+    libudev-dev \
+    libxkbcommon-dev \
     sudo && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Flutter
-RUN git clone https://github.com/flutter/flutter.git /usr/local/flutter
-ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:${PATH}"
-RUN flutter channel stable
-RUN flutter upgrade
-RUN flutter config --enable-linux-desktop
+# Install additional dependencies for gstreamer (if needed)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    libgstreamer-plugins-bad1.0-dev \
+    gstreamer1.0-plugins-base \
+    gstreamer1.0-plugins-good \
+    gstreamer1.0-plugins-ugly \
+    gstreamer1.0-plugins-bad \
+    gstreamer1.0-libav \
+    gstreamer1.0-alsa && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install Flutter Pi
-RUN git clone https://github.com/ardera/flutter-pi.git /usr/local/flutter-pi
-RUN cd /usr/local/flutter-pi && make
+# Clone flutter-engine-binaries-for-arm repository and install
+RUN git clone --depth 1 https://github.com/ardera/flutter-engine-binaries-for-arm.git engine-binaries
+WORKDIR /engine-binaries
+RUN sudo ./install.sh
 
-# Copy project files
-WORKDIR /app
-COPY pubspec.yaml /app/pubspec.yaml
-COPY pubspec.lock /app/pubspec.lock
+# Clone flutter-pi repository and compile
+RUN git clone --recursive https://github.com/ardera/flutter-pi /usr/local/flutter-pi
+WORKDIR /usr/local/flutter-pi
+RUN mkdir build && cd build && cmake .. && make -j$(nproc) && sudo make install
+
+# Install Flutter SDK
+WORKDIR /home/pi/Documents
+RUN wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_2.10.5-stable.tar.xz
+RUN tar xf flutter_linux_2.10.5-stable.tar.xz
+
+# Update PATH
+RUN echo 'export PATH="$PATH:/home/pi/Documents/flutter/bin"' >> ~/.bashrc
+RUN echo 'export PATH=$PATH:/opt/flutter-elinux/bin' >> ~/.bashrc
+RUN echo 'export PATH=$PATH:/home/pi/snap/flutter/common/flutter' >> ~/.bashrc
+RUN echo 'export PATH=$PATH:/home/pi/Documents/build/flutter_assets' >> ~/.bashrc
+RUN echo 'export PATH=$PATH:/home/pi/Documents/flutters/bin' >> ~/.bashrc
+RUN source ~/.bashrc
+
+# Copy project files and build Flutter app
+COPY flutter_gallery /home/pi/Documents/flutter_gallery
+WORKDIR /home/pi/Documents/flutter_gallery
 RUN flutter pub get
-COPY . /app
+RUN flutter build bundle
 
-# Build the Flutter app for Linux
-RUN flutter build linux --release
+# Sync build assets
+RUN rsync -a ./build/flutter_assets /home/pi/Documents/flutter_gallery/build/flutter_assets
 
-# Run the app using Flutter Pi
-CMD ["flutter-pi", "/app/build/linux/release/bundle"]
+# Install xdg-user-dirs if needed
+RUN apt-get update && apt-get install -y --no-install-recommends xdg-user-dirs && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Run the Flutter app in profile mode
+CMD ["flutter", "run", "--profile"]
