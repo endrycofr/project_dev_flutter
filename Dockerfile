@@ -1,12 +1,14 @@
-# Use a base image with the necessary architecture for ARM64
+# Use a base image with ARM64 architecture
 FROM arm64v8/debian:bullseye
 
 # Set non-interactive to avoid prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+# Update package sources
+RUN apt-get update
+
+# Install base dependencies with error checking
+RUN apt-get install -y --no-install-recommends \
     git \
     wget \
     curl \
@@ -24,8 +26,10 @@ RUN apt-get update && \
     libinput-dev \
     libudev-dev \
     libxkbcommon-dev \
-    sudo && \
-    apt-get clean && \
+    sudo
+
+# Clean up package cache
+RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Flutter SDK
