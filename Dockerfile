@@ -52,26 +52,26 @@ WORKDIR /usr/local/flutter-pi
 RUN mkdir build && cd build && cmake .. && make -j$(nproc) && sudo make install
 
 # Install Flutter SDK
-WORKDIR /home/pi/Documents
+WORKDIR /home/rootnow
 RUN wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_2.10.5-stable.tar.xz
 RUN tar xf flutter_linux_2.10.5-stable.tar.xz
 
 # Update PATH
-RUN echo 'export PATH="$PATH:/home/pi/Documents/flutter/bin"' >> ~/.bashrc
+RUN echo 'export PATH="$PATH:/home/rootnow/flutter/bin"' >> ~/.bashrc
 RUN echo 'export PATH=$PATH:/opt/flutter-elinux/bin' >> ~/.bashrc
-RUN echo 'export PATH=$PATH:/home/pi/snap/flutter/common/flutter' >> ~/.bashrc
-RUN echo 'export PATH=$PATH:/home/pi/Documents/build/flutter_assets' >> ~/.bashrc
-RUN echo 'export PATH=$PATH:/home/pi/Documents/flutters/bin' >> ~/.bashrc
+RUN echo 'export PATH=$PATH:/home/rootnow/snap/flutter/common/flutter' >> ~/.bashrc
+RUN echo 'export PATH=$PATH:/home/rootnow/project_dev_flutter/build/flutter_assets' >> ~/.bashrc
+RUN echo 'export PATH=$PATH:/home/rootnow/flutter/bin' >> ~/.bashrc
 RUN source ~/.bashrc
 
 # Copy project files and build Flutter app
-COPY flutter_gallery /home/pi/Documents/flutter_gallery
-WORKDIR /home/pi/Documents/flutter_gallery
+COPY project_dev_flutter /home/rootnow/project_dev_flutter
+WORKDIR /home/rootnow/project_dev_flutter
 RUN flutter pub get
 RUN flutter build bundle
 
 # Sync build assets
-RUN rsync -a ./build/flutter_assets /home/pi/Documents/flutter_gallery/build/flutter_assets
+RUN rsync -a ./build/flutter_assets /home/rootnow/project_dev_flutter/build/flutter_assets
 
 # Install xdg-user-dirs if needed
 RUN apt-get update && apt-get install -y --no-install-recommends xdg-user-dirs && apt-get clean && rm -rf /var/lib/apt/lists/*
