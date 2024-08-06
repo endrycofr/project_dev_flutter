@@ -5,11 +5,17 @@ FROM ubuntu:latest
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Update package sources and install dependencies
-RUN apt -y update && 
-RUN apt-get install -y  software-properties-common && \
+# Update package sources
+RUN apt -y update && \
+    apt -y upgrade
+
+# Install software-properties-common and add the multiverse repository
+RUN apt-get install -y software-properties-common && \
     add-apt-repository multiverse && \
-    apt -y update && \
-    apt -y install -y \
+    apt -y update
+
+# Install basic utilities and dependencies
+RUN apt -y install \
     git \
     wget \
     curl \
@@ -25,8 +31,13 @@ RUN apt-get install -y  software-properties-common && \
     libsystemd-dev \
     libinput-dev \
     libudev-dev \
-    libxkbcommon-dev \
-    ttf-mscorefonts-installer && \
+    libxkbcommon-dev && \
+    apt -y clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install ttf-mscorefonts-installer separately with confirmation
+RUN echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections && \
+    apt -y install ttf-mscorefonts-installer && \
     apt -y clean && \
     rm -rf /var/lib/apt/lists/*
 
