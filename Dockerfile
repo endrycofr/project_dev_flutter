@@ -36,7 +36,8 @@ RUN apt-get install -y \
     rm -rf /var/lib/apt/lists/*
 
 # Install ttf-mscorefonts-installer separately with confirmation
-RUN echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections && \
+RUN apt-get install -y debconf-utils && \
+    echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections && \
     apt-get install -y ttf-mscorefonts-installer && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
