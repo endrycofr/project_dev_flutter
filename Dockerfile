@@ -6,24 +6,10 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Update package sources and install basic utilities
 RUN apt -y update && \
-    apt -y install \
-    git \
-    wget \
-    build-essential \
-    cmake \
-    libgl1-mesa-dev \
-    libgles2-mesa-dev \
-    libegl1-mesa-dev \
-    libdrm-dev \
-    libgbm-dev \
-    ttf-mscorefonts-installer \
-    fontconfig \
-    libsystemd-dev \
-    libinput-dev \
-    libudev-dev \
-    libxkbcommon-dev \
-    && apt -y clean && \
-    rm -rf /var/lib/apt/lists/*
+    apt -y install software-properties-common && \
+    add-apt-repository multiverse && \
+    apt -y update && \
+    apt -y install ttf-mscorefonts-installer
 
 # Set the timezone
 ENV TZ=Europe/Rome
