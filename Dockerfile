@@ -35,13 +35,6 @@ RUN apt-get install -y \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install ttf-mscorefonts-installer separately with confirmation
-RUN apt-get install -y debconf-utils && \
-    echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections && \
-    apt-get install -y ttf-mscorefonts-installer && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
 # Set the timezone
 ENV TZ=Europe/Rome
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
