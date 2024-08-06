@@ -5,8 +5,8 @@ FROM ubuntu:latest
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Update package sources and install dependencies
-RUN apt -y update && \
-    apt -y install software-properties-common && \
+RUN apt -y update && 
+RUN apt-get install -y  software-properties-common && \
     add-apt-repository multiverse && \
     apt -y update && \
     apt -y install -y \
