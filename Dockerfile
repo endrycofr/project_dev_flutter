@@ -9,11 +9,6 @@ RUN apt-get update -y && \
     apt-get upgrade -y && \
     apt-get dist-upgrade -y
 
-# Install software-properties-common and add the multiverse repository
-RUN apt-get install -y software-properties-common && \
-    add-apt-repository multiverse && \
-    apt-get update -y
-
 # Install basic utilities and dependencies
 RUN apt-get install -y \
     git \
@@ -31,7 +26,9 @@ RUN apt-get install -y \
     libsystemd-dev \
     libinput-dev \
     libudev-dev \
-    libxkbcommon-dev && \
+    libxkbcommon-dev \
+    libglfw3-dev \
+    libflutter-pi-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -65,7 +62,7 @@ RUN flutter pub get
 # Copy the rest of the application code
 COPY . /TOWER_DISPLAY/
 
-# Build the Flutter project
+# Build the Flutter project for Linux
 RUN flutter build linux
 
 # Expose the necessary port (if your Flutter app serves on a port)
