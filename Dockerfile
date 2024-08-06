@@ -28,7 +28,10 @@ RUN apt-get install -y \
     libudev-dev \
     libxkbcommon-dev \
     libglfw3-dev \
-    libflutter-pi-dev && \
+    libgles2-mesa-dev \
+    libwayland-dev \
+    pkg-config \
+    liblz4-tool && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -51,6 +54,13 @@ RUN yes | flutter doctor --android-licenses || true
 
 # Run flutter doctor
 RUN flutter doctor
+
+# Clone flutter-pi repository
+RUN git clone https://github.com/ardera/flutter-pi.git /usr/local/flutter-pi
+
+# Build flutter-pi
+WORKDIR /usr/local/flutter-pi
+RUN mkdir build && cd build && cmake .. && make -j4
 
 # Create a directory for the project
 WORKDIR /TOWER_DISPLAY
