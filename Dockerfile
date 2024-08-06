@@ -4,18 +4,18 @@ FROM ubuntu:latest
 # Set non-interactive to avoid prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update package sources and install dependencies
-# Update package sources
-RUN apt -y update && \
-    apt -y upgrade
+# Update package sources and upgrade
+RUN apt-get update -y && \
+    apt-get upgrade -y && \
+    apt-get dist-upgrade -y
 
 # Install software-properties-common and add the multiverse repository
 RUN apt-get install -y software-properties-common && \
     add-apt-repository multiverse && \
-    apt -y update
+    apt-get update -y
 
 # Install basic utilities and dependencies
-RUN apt -y install \
+RUN apt-get install -y \
     git \
     wget \
     curl \
@@ -32,13 +32,13 @@ RUN apt -y install \
     libinput-dev \
     libudev-dev \
     libxkbcommon-dev && \
-    apt -y clean && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Install ttf-mscorefonts-installer separately with confirmation
 RUN echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections && \
-    apt -y install ttf-mscorefonts-installer && \
-    apt -y clean && \
+    apt-get install -y ttf-mscorefonts-installer && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Set the timezone
