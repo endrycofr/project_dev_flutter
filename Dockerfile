@@ -62,7 +62,7 @@ WORKDIR /home/flutteruser
 RUN flutter doctor -v
 
 # Pre-download Flutter dependencies
-RUN flutter precache --no-analytics
+RUN flutter precache 
 
 # Clone flutter-pi repository
 RUN git clone https://github.com/ardera/flutter-pi.git /home/flutteruser/flutter-pi
