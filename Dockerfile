@@ -36,7 +36,8 @@ RUN apt-get install -y \
     libglfw3-dev \
     libwayland-dev \
     pkg-config \
-    liblz4-tool && \
+    liblz4-tool \
+    libgtk-3-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
