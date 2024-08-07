@@ -4,6 +4,9 @@ FROM ubuntu:latest
 # Set non-interactive to avoid prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Use a faster mirror (optional, adjust to your region)
+RUN sed -i 's|http://archive.ubuntu.com/ubuntu/|http://mirror.speedpartner.de/ubuntu/|g' /etc/apt/sources.list
+
 # Update package sources and upgrade
 RUN apt-get update -y && \
     apt-get upgrade -y && \
