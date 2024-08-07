@@ -22,6 +22,7 @@ RUN apt-get install -y \
     cmake \
     ninja-build \
     g++ \
+    clang \
     libgl1-mesa-dev \
     libgles2-mesa-dev \
     libegl1-mesa-dev \
@@ -49,7 +50,8 @@ RUN git clone https://github.com/flutter/flutter.git -b stable --depth 1 /usr/lo
 
 # Set Flutter environment variables
 ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:${PATH}"
-
+# Set the CXX environment variable to g++
+ENV CXX=g++
 # Create a non-root user and switch to that user
 RUN useradd -ms /bin/bash flutteruser
 
