@@ -48,6 +48,9 @@ RUN git clone https://github.com/flutter/flutter.git -b stable --depth 1 /usr/lo
 # Set Flutter environment variables
 ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:${PATH}"
 
+# Run flutter doctor to verify the setup
+RUN flutter doctor -v
+
 # Pre-download Flutter dependencies
 RUN flutter precache --no-analytics
 
@@ -63,11 +66,6 @@ WORKDIR /TOWER_DISPLAY
 
 # Copy pubspec.yaml and install dependencies
 COPY pubspec.yaml /TOWER_DISPLAY/
-
-# Run flutter doctor for debugging
-RUN flutter doctor -v
-
-# Install Flutter dependencies
 RUN flutter pub get
 
 # Copy the rest of the application code
