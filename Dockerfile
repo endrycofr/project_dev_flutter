@@ -46,15 +46,6 @@ RUN git clone https://github.com/flutter/flutter.git -b stable --depth 1 /usr/lo
 # Set Flutter environment variables
 ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:${PATH}"
 
-# Pre-download Flutter dependencies
-RUN flutter precache --no-analytics
-
-# Accept Android licenses (if needed)
-RUN yes | flutter doctor --android-licenses || true
-
-# Run flutter doctor
-RUN flutter doctor
-
 # Clone flutter-pi repository
 RUN git clone https://github.com/ardera/flutter-pi.git /usr/local/flutter-pi
 
