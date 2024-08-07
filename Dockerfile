@@ -81,6 +81,13 @@ RUN flutter pub get
 # Copy the rest of the application code
 COPY . /home/flutteruser/TOWER_DISPLAY/
 
+# Change ownership of the copied files
+USER root
+RUN chown -R flutteruser:flutteruser /home/flutteruser/TOWER_DISPLAY
+
+# Switch back to non-root user
+USER flutteruser
+
 # Build the Flutter project for Linux
 RUN flutter build linux
 
