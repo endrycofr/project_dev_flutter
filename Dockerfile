@@ -28,7 +28,6 @@ RUN apt-get install -y \
     libudev-dev \
     libxkbcommon-dev \
     libglfw3-dev \
-    libgles2-mesa-dev \
     libwayland-dev \
     pkg-config \
     liblz4-tool && \
@@ -46,18 +45,26 @@ RUN git clone https://github.com/flutter/flutter.git -b stable --depth 1 /usr/lo
 # Set Flutter environment variables
 ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:${PATH}"
 
+# Pre-download Flutter dependencies
+RUN flutter precache --no-analytics
+
 # Clone flutter-pi repository
 RUN git clone https://github.com/ardera/flutter-pi.git /usr/local/flutter-pi
 
 # Build flutter-pi
 WORKDIR /usr/local/flutter-pi
-RUN mkdir build && cd build && cmake .. && make -j4
+RUN mkdir build && cd build && cmake .. && make -j$(nproc)
 
 # Create a directory for the project
 WORKDIR /TOWER_DISPLAY
 
 # Copy pubspec.yaml and install dependencies
 COPY pubspec.yaml /TOWER_DISPLAY/
+
+# Run flutter doctor for debugging
+RUN flutter doctor -v
+
+# Install Flutter dependencies
 RUN flutter pub get
 
 # Copy the rest of the application code
