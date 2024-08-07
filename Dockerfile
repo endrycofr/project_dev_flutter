@@ -50,6 +50,11 @@ ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:${PAT
 
 # Create a non-root user and switch to that user
 RUN useradd -ms /bin/bash flutteruser
+
+# Change ownership of the Flutter directory
+RUN chown -R flutteruser:flutteruser /usr/local/flutter
+
+# Switch to the non-root user
 USER flutteruser
 WORKDIR /home/flutteruser
 
