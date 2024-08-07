@@ -48,6 +48,11 @@ RUN git clone https://github.com/flutter/flutter.git -b stable --depth 1 /usr/lo
 # Set Flutter environment variables
 ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:${PATH}"
 
+# Create a non-root user and switch to that user
+RUN useradd -ms /bin/bash flutteruser
+USER flutteruser
+WORKDIR /home/flutteruser
+
 # Run flutter doctor to verify the setup
 RUN flutter doctor -v
 
@@ -55,21 +60,21 @@ RUN flutter doctor -v
 RUN flutter precache --no-analytics
 
 # Clone flutter-pi repository
-RUN git clone https://github.com/ardera/flutter-pi.git /usr/local/flutter-pi
+RUN git clone https://github.com/ardera/flutter-pi.git /home/flutteruser/flutter-pi
 
 # Build flutter-pi
-WORKDIR /usr/local/flutter-pi
+WORKDIR /home/flutteruser/flutter-pi
 RUN mkdir build && cd build && cmake .. && make -j$(nproc)
 
 # Create a directory for the project
-WORKDIR /TOWER_DISPLAY
+WORKDIR /home/flutteruser/TOWER_DISPLAY
 
 # Copy pubspec.yaml and install dependencies
-COPY pubspec.yaml /TOWER_DISPLAY/
+COPY pubspec.yaml /home/flutteruser/TOWER_DISPLAY/
 RUN flutter pub get
 
 # Copy the rest of the application code
-COPY . /TOWER_DISPLAY/
+COPY . /home/flutteruser/TOWER_DISPLAY/
 
 # Build the Flutter project for Linux
 RUN flutter build linux
