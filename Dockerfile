@@ -20,6 +20,8 @@ RUN apt-get install -y \
     unzip \
     build-essential \
     cmake \
+    ninja-build \
+    g++ \
     libgl1-mesa-dev \
     libgles2-mesa-dev \
     libegl1-mesa-dev \
