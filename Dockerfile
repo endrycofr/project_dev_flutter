@@ -96,8 +96,5 @@ USER flutteruser
 # Build the Flutter project for Linux
 RUN flutter build linux
 
-# Expose the necessary port (if your Flutter app serves on a port)
-EXPOSE 8080
-
-# Default command to run when the container starts
-CMD ["bash"]
+# Set the entry point to run your Flutter application
+CMD ["/home/flutteruser/flutter-pi/build/flutter-pi", "/home/flutteruser/TOWER_DISPLAY/build/linux/main.dart"]
