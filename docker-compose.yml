@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  flutter-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flutter_app
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - .:/home/flutteruser/TOWER_DISPLAY
+    restart: always
+    command:
+      [
+        "/home/flutteruser/flutter-pi/build/flutter-pi",
+        "/home/flutteruser/TOWER_DISPLAY/build/linux/x64/release/bundle/project_deploy",
+      ]
+    network_mode: "host"
