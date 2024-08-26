@@ -5,15 +5,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: flutter_app
+    container_name: flutter_app_container
     environment:
-      - DISPLAY=${DISPLAY}
+      - DISPLAY=${DISPLAY} # Untuk mendukung tampilan GUI jika diperlukan
+    ports:
+      - "8080:8080" # Atur port sesuai kebutuhan aplikasi Flutter Anda
     volumes:
       - .:/home/flutteruser/TOWER_DISPLAY
     restart: always
+    network_mode: "host" # Menggunakan network_mode host jika aplikasi memerlukan akses langsung ke jaringan host
     command:
       [
         "/home/flutteruser/flutter-pi/build/flutter-pi",
         "/home/flutteruser/TOWER_DISPLAY/build/linux/x64/release/bundle/project_deploy",
       ]
-    network_mode: "host"
